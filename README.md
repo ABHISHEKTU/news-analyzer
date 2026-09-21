@@ -75,33 +75,35 @@ FinBERT falls back to VADER automatically if the model fails to load, so a singl
 
 ## Project Structure
 
+```text
 news_analyzer/
 ├── app/
-│ ├── main.py # FastAPI app entrypoint
-│ ├── api/
-│ │ ├── routes.py # REST endpoints
-│ │ └── schemas.py # Pydantic response models
-│ ├── core/
-│ │ ├── config.py # Centralized settings (env-driven)
-│ │ └── celery_app.py # Celery configuration + beat schedule
-│ ├── scraper/
-│ │ ├── base.py # Abstract scraper interface
-│ │ ├── rss_scraper.py # RSS feed scraper
-│ │ ├── stocktwits_scraper.py # StockTwits public API scraper
-│ │ └── utils.py # Shared HTML/entity cleaning
-│ ├── nlp/
-│ │ └── sentiment.py # FinBERT + VADER, routing logic
-│ ├── db/
-│ │ ├── models.py # SQLAlchemy models
-│ │ └── session.py # DB engine/session management
-│ ├── tasks/
-│ │ └── pipeline.py # Celery task: scrape → analyze → store
-│ └── reports/
-│ └── generator.py # Sentiment aggregation logic
+│   ├── main.py                  # FastAPI app entrypoint
+│   ├── api/
+│   │   ├── routes.py             # REST endpoints
+│   │   └── schemas.py            # Pydantic response models
+│   ├── core/
+│   │   ├── config.py             # Centralized settings (env-driven)
+│   │   └── celery_app.py         # Celery configuration + beat schedule
+│   ├── scraper/
+│   │   ├── base.py               # Abstract scraper interface
+│   │   ├── rss_scraper.py        # RSS feed scraper
+│   │   ├── stocktwits_scraper.py # StockTwits public API scraper
+│   │   └── utils.py              # Shared HTML/entity cleaning
+│   ├── nlp/
+│   │   └── sentiment.py          # FinBERT + VADER, routing logic
+│   ├── db/
+│   │   ├── models.py             # SQLAlchemy models
+│   │   └── session.py            # DB engine/session management
+│   ├── tasks/
+│   │   └── pipeline.py           # Celery task: scrape → analyze → store
+│   └── reports/
+│       └── generator.py          # Sentiment aggregation logic
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
-└── .env # Local config (not committed)
+└── .env                          # Local config (not committed)
+```
 
 
 ---
