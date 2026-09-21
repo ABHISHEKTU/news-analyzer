@@ -1,0 +1,27 @@
+# Virtual environment
+venv/
+
+# Environment variables (secrets)
+.env
+
+# Database
+news.db
+*.db
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Celery beat schedule file
+celerybeat-schedule*
+
+# IDE
+.vscode/
+.idea/
+
+# Scratch test files (optional - remove this line if you want to keep them for reference)
+scratch_*.py
+
+# OS
+Thumbs.db
+.DS_Store
