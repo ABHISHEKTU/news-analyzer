@@ -20,46 +20,25 @@ The system runs as five containerized services (API, worker, scheduler, message 
 
 ## Architecture
 
-┌─────────────┐ ┌──────────────┐ ┌─────────────────┐
-│ RSS Feeds │ │ StockTwits │ │ (extensible │
-│ (Moneycontrol│ │ Public API │ │ to more sources)│
-│ /Economy) │ │ │ │ │
-└──────┬───────┘ └──────┬───────┘ └──────────────────┘
-│ │
-└──────────┬──────────┘
-▼
-┌─────────────────┐
-│ Scraper Layer │ (per-source error isolation,
-│ (base + impls) │ HTML/entity cleaning)
-└────────┬─────────┘
-▼
-┌──────────────────────┐
-│ Sentiment Router │
-│ ┌─────────┐ ┌──────┐ │
-│ │ FinBERT │ │VADER │ │ news → FinBERT (formal text)
-│ │ (news) │ │(social)│ social → VADER (informal text)
-│ └─────────┘ └──────┘ │
-└──────────┬────────────┘
-▼
-┌───────────────────────┐
-│ PostgreSQL Storage │ (URL-unique, dedupe-safe,
-│ (Article table) │ intra-batch + cross-run)
-└──────────┬─────────────┘
-│
-┌──────────────┼──────────────┐
-▼ ▼ ▼
-┌─────────────┐ ┌───────────┐ ┌──────────────┐
-│ Celery Beat │ │ Celery │ │ FastAPI │
-│ (scheduler, │ │ Worker │ │ (REST API) │
-│ every 30m) │ │ (executes │ │ │
-│ │ │ via Redis│ │ /trigger-scan│
-│ │ │ queue) │ │ /task-status │
-│ │ │ │ │ /articles │
-│ │ │ │ │ /report │
-└─────────────┘ └───────────┘ └──────────────┘
-
+```mermaid
+flowchart TD
+    A[RSS Feeds<br/>Moneycontrol Business/Economy] --> C[Scraper Layer]
+    B[StockTwits Public API] --> C
+    C -->|per-source error isolation,<br/>HTML/entity cleaning| D[Sentiment Router]
+    D -->|news| E[FinBERT]
+    D -->|social| F[VADER]
+    E --> G[(PostgreSQL Storage)]
+    F --> G
+    G --> H[Celery Beat<br/>scheduler, every 30m]
+    G --> I[Celery Worker<br/>executes via Redis queue]
+    G --> J[FastAPI<br/>REST API]
+    H --> I
+    J -->|/trigger-scan| I
+    J -->|/task-status, /articles, /report| G
+```
 
 **Flow**: Beat schedules a scan every 30 minutes → dispatches a task to Redis → a Celery worker picks it up → scrapes both sources → routes each item through the correct sentiment engine → deduplicates and stores in Postgres → results are queryable instantly via the API, with a weighted aggregate mood score computed on demand.
+
 
 ---
 
