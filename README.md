@@ -18,6 +18,9 @@ The system runs as five containerized services (API, worker, scheduler, message 
 
 ---
 
+![Demo](docs/demo.gif)
+
+
 ## Architecture
 
 ```mermaid
